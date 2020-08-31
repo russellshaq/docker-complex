@@ -1,0 +1,33 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "client",
+      "image": "shakirovusa/complex-client",
+      "essential": false,
+      "memory": 128
+    },
+    {
+      "name": "api",
+      "image": "shakirovusa/complex-api",
+      "essential": false,
+      "memory": 128
+    },
+    {
+      "name": "nginx",
+      "image": "shakirovusa/complex-nginx",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": [
+        "client",
+        "api"
+      ]
+    }
+  ]
+}

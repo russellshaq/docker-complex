@@ -1,0 +1,26 @@
+sudo: required
+services:
+  - docker
+before_install:
+  - docker build -f ./client/Dockerfile.dev -t shakirovusa/client-test ./client
+script:
+  - docker run -e CI=true shakirovusa/client-test npm run test
+after_success:
+  - docker build -t shakirovusa/complex-client ./client
+  - docker build -t shakirovusa/complex-nginx ./nginx
+  - docker build -t shakirovusa/complex-api ./api
+  - echo $DOCKER_PASSWORD | docker login -u $DOCKER_ID --password-stdin
+  - docker push shakirovusa/complex-client
+  - docker push shakirovusa/complex-nginx
+  - docker push shakirovusa/complex-api
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: '$ACCESS_ID'
+  secret_access_key: '$ACCESS_SECRET'
+  region: 'eu-central-1'
+  app: 'docker-complex'
+  env: 'DockerComplex-env'
+  bucket_name: elasticbeanstalk-eu-central-1-251245837115
+  bucker_path: docker-complex
+  on:
+    branch: master
